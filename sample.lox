@@ -1,0 +1,3 @@
+var x = 1.123
+var t = "this is a string"
+print t

@@ -6,7 +6,11 @@ std::string Token::to_str() const
 	{
 		token_to_string.insert(std::make_pair(key_value.second, key_value.first));
 	}
-    std::string repr = "token_type: " + token_to_string[type] + " lexeme: " + lexeme + " line: " + std::to_string(line);
+
+	std::string repr = "token_type: " + token_to_string[type]
+		+ " lexeme: " + lexeme
+		+ " line: " + std::to_string(line);
+
 	if(type == STRING)
 		repr += " value: " + literal.s;
 	else if(type == NUMBER)

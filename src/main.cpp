@@ -8,11 +8,8 @@ void run(std::string source)
 {
     std::cout<<source<<std::endl;
     auto scanner = Scanner(source);
-    auto tokens = scanner.scan_tokens();
-    for(const auto& token: tokens)
-    {
-        std::cout<<token.to_str()<<std::endl;
-    }
+    scanner.scan_tokens();
+	scanner.print_tokens();
 }
 
 int run_file(std::string filename)

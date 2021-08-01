@@ -1,19 +1,7 @@
 #include <iostream>
 #include "scanner.h"
 #include "token.h"
-
-bool isdigit(char c)
-{
-	return c >= '0' && c <= '9';
-}
-
-bool isalpha(char c)
-{
-	return (c >= 'a' && c <= 'z') ||
-		(c >= 'A' && c <= 'Z') || c == '_';
-}
-
-bool isalpha_numeric(char c) { return isdigit(c) || isalpha(c); }
+#include "utils.h"
 
 char Scanner::advance()
 {
@@ -161,7 +149,7 @@ void Scanner::scan_token()
     }
 }
 
-std::vector<Token> Scanner::scan_tokens()
+void Scanner::scan_tokens()
 {
     size_t nchar = source.size();
     while(current < nchar)
@@ -170,5 +158,12 @@ std::vector<Token> Scanner::scan_tokens()
         scan_token();
     }
     tokens.push_back(Token(TokenType::EOFF, "", LiteralObject(), line));
-    return tokens;
+}
+
+void Scanner::print_tokens()
+{
+    for(const auto& token: tokens)
+    {
+        std::cout<<token.to_str()<<std::endl;
+    }
 }
