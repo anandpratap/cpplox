@@ -132,19 +132,17 @@ void Scanner::scan_token()
 	case '\n': line++; break;
 
 	default:
+		if(isdigit(current_char))
 		{
-			if(isdigit(current_char))
-			{
-				number();
-			}
-			else if(isalpha(current_char))
-			{
-				identifier();
-			}
-			else
-			{
+			number();
+		}
+		else if(isalpha(current_char))
+		{
+			identifier();
+		}
+		else
+		{
 			std::cout<<"not found line: "<<line<<std::endl; break;
-			}
 		}
     }
 }
