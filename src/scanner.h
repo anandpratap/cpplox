@@ -20,5 +20,9 @@ class Scanner{
     bool match(char expected);
     bool is_at_end();
     char peek();
+	char peek_next();
     void string();
+	void number();
+	void identifier();
+
 };

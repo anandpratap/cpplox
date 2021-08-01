@@ -2,6 +2,19 @@
 #include "scanner.h"
 #include "token.h"
 
+bool isdigit(char c)
+{
+	return c >= '0' && c <= '9';
+}
+
+bool isalpha(char c)
+{
+	return (c >= 'a' && c <= 'z') ||
+		(c >= 'A' && c <= 'Z') || c == '_';
+}
+
+bool isalpha_numeric(char c) { return isdigit(c) || isalpha(c); }
+
 char Scanner::advance()
 {
     current += 1;
@@ -12,6 +25,12 @@ char Scanner::peek()
 {
     if(is_at_end()) return '\0';
     return source[current];
+}
+
+char Scanner::peek_next()
+{
+    if(current + 1 >= source.size()) return '\0';
+    return source[current+1];
 }
 
 void Scanner::add_token(TokenType type)
@@ -54,47 +73,91 @@ void Scanner::string()
     literal.s = source.substr(start+1, current - start - 2);
     add_token(STRING, literal);
 }
+
+void Scanner::number() {
+	while(isdigit(peek())) advance();
+	if(peek() == '.' && isdigit(peek_next()))
+	{
+		advance();
+		while(isdigit(peek())) advance();
+	}
+	LiteralObject literal;
+	literal.n = std::stod(source.substr(start, current - start));
+	add_token(NUMBER, literal);
+}
+
+void Scanner::identifier()
+{
+	while(isalpha_numeric(peek())) advance();
+	auto text = source.substr(start, current - start);
+	TokenType type;
+	try
+	{
+		type = string_to_token.at(text);
+	}
+	catch(std::out_of_range e)
+	{
+		type = IDENTIFIER;
+	}
+	add_token(type);
+}
+
 void Scanner::scan_token()
 {
     char current_char = advance();
     switch(current_char)
     {
-        
-        case '(': add_token(LEFT_PAREN); break; 
-        case ')': add_token(RIGHT_PAREN); break; 
-        case '{': add_token(LEFT_BRACE); break; 
-        case '}': add_token(RIGHT_BRACE); break; 
-        case ',': add_token(COMMA); break;
-        case '.': add_token(DOT); break;
-        case '-': add_token(MINUS); break; 
-        case '+': add_token(PLUS); break;
-        case ';': add_token(SEMICOLON); break; 
-        case '*': add_token(STAR); break;
-        case '!':
+
+	case '(': add_token(LEFT_PAREN); break;
+	case ')': add_token(RIGHT_PAREN); break;
+	case '{': add_token(LEFT_BRACE); break;
+	case '}': add_token(RIGHT_BRACE); break;
+	case ',': add_token(COMMA); break;
+	case '.': add_token(DOT); break;
+	case '-': add_token(MINUS); break;
+	case '+': add_token(PLUS); break;
+	case ';': add_token(SEMICOLON); break;
+	case '*': add_token(STAR); break;
+	case '!':
         add_token(match('=') ? BANG_EQUAL : BANG); break;
-        case '=':
+	case '=':
         add_token(match('=') ? EQUAL_EQUAL : EQUAL); break;
-        case '<':
+	case '<':
         add_token(match('=') ? LESS_EQUAL : LESS); break;
-        case '>':
+	case '>':
         add_token(match('=') ? GREATER_EQUAL : GREATER); break;
-        case '/':
+	case '/':
         if (match('/')) {
             // A comment goes until the end of the line.
-            while (peek() != '\n' && !is_at_end()) advance(); 
-        } 
+            while (peek() != '\n' && !is_at_end()) advance();
+        }
         else {
             add_token(SLASH);
         }
         break;
-        case ' ': 
-        case '\r': 
-        case '\t':
+	case ' ':
+	case '\r':
+	case '\t':
         // Ignore whitespace.
         break;
-        case '"': string(); break;
-        case '\n': line++; break;
-        default: std::cout<<"not found line: "<<line<<std::endl; break;
+	case '"': string(); break;
+	case '\n': line++; break;
+
+	default:
+		{
+			if(isdigit(current_char))
+			{
+				number();
+			}
+			else if(isalpha(current_char))
+			{
+				identifier();
+			}
+			else
+			{
+			std::cout<<"not found line: "<<line<<std::endl; break;
+			}
+		}
     }
 }
 
